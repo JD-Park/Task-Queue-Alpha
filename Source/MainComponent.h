@@ -8,11 +8,11 @@
     your controls and content.
 */
 
-class ValueTreeItem : public juce::TreeViewItem,
+class TaskQueueItem : public juce::TreeViewItem,
     private juce::ValueTree::Listener
 {
 public:
-    ValueTreeItem(const juce::ValueTree& v, juce::UndoManager& um)
+    TaskQueueItem(const juce::ValueTree& v, juce::UndoManager& um)
         : tree(v), undoManager(um)
     {
         tree.addListener(this);
@@ -98,7 +98,7 @@ public:
         auto numSelected = treeView.getNumSelectedItems();
 
         for (int i = 0; i < numSelected; ++i)
-            if (auto* vti = dynamic_cast<ValueTreeItem*> (treeView.getSelectedItem(i)))
+            if (auto* vti = dynamic_cast<TaskQueueItem*> (treeView.getSelectedItem(i)))
                 items.add(new juce::ValueTree(vti->tree));
     }
 
@@ -111,7 +111,7 @@ private:
         clearSubItems();
 
         for (int i = 0; i < tree.getNumChildren(); ++i)
-            addSubItem(new ValueTreeItem(tree.getChild(i), undoManager));
+            addSubItem(new TaskQueueItem(tree.getChild(i), undoManager));
     }
 
     void valueTreePropertyChanged(juce::ValueTree&, const juce::Identifier&) override
@@ -141,35 +141,30 @@ private:
     juce::Colour sand{ 156u, 130u, 107u };
 
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ValueTreeItem)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TaskQueueItem)
 };
 
 //==============================================================================
-class ValueTreesDemo : public juce::Component,
+class TaskQueueContainer : public juce::Component,
     public juce::DragAndDropContainer,
     private juce::Timer
 {
 public:
-    ValueTreesDemo()
+    TaskQueueContainer()
     {
         addAndMakeVisible(tree);
 
         tree.setDefaultOpenness(true);
         tree.setMultiSelectEnabled(true);
-        rootItem.reset(new ValueTreeItem(createRootValueTree(), undoManager));
+        rootItem.reset(new TaskQueueItem(createRootValueTree(), undoManager));
         tree.setRootItem(rootItem.get());
-
-        //addAndMakeVisible(undoButton);
-        //addAndMakeVisible(redoButton);
-        //undoButton.onClick = [this] { undoManager.undo(); };
-        //redoButton.onClick = [this] { undoManager.redo(); };
 
         startTimer(500);
 
         setSize(500, 500);
     }
 
-    ~ValueTreesDemo() override
+    ~TaskQueueContainer() override
     {
         tree.setRootItem(nullptr);
     }
@@ -183,74 +178,14 @@ public:
     {
         auto r = getLocalBounds().reduced(8);
 
-        //auto buttons = r.removeFromBottom(22);
-        //undoButton.setBounds(buttons.removeFromLeft(100));
-        //buttons.removeFromLeft(6);
-        //redoButton.setBounds(buttons.removeFromLeft(100));
-
-        //r.removeFromBottom(4);
         tree.setBounds(r);
     }
 
     juce::ValueTree createRootValueTree()
     {
-        //auto vt = createTree("This demo displays a ValueTree as a treeview.");
-        //vt.appendChild(createTree("You can drag around the nodes to rearrange them"), nullptr);
-        //vt.appendChild(createTree("..and press 'delete' or 'backspace' to delete them"), nullptr);
-        //vt.appendChild(createTree("Then, you can use the undo/redo buttons to undo these changes"), nullptr);
-
-        //int n = 1;
-        //vt.appendChild(createRandomTree(n, 0), nullptr);
-
         auto vt = createTree("Task Queue Tree");
         return vt;
     }
-
-    //static juce::ValueTree createRandomTree(int& counter, int depth)
-    //{
-    //    auto t = createTree("Item " + juce::String(counter++));
-
-    //    if (depth < 3)
-    //        for (int i = 1 + juce::Random::getSystemRandom().nextInt(7); --i >= 0;)
-    //            t.appendChild(createRandomTree(counter, depth + 1), nullptr);
-
-    //    return t;
-    //}
-
-    //void deleteSelectedItems()
-    //{
-    //    juce::OwnedArray<juce::ValueTree> selectedItems;
-    //    ValueTreeItem::getSelectedTreeViewItems(tree, selectedItems);
-
-    //    for (auto* v : selectedItems)
-    //    {
-    //        if (v->getParent().isValid())
-    //            v->getParent().removeChild(*v, &undoManager);
-    //    }
-    //}
-
-    //bool keyPressed(const juce::KeyPress& key) override
-    //{
-    //    if (key == juce::KeyPress::deleteKey || key == juce::KeyPress::backspaceKey)
-    //    {
-    //        deleteSelectedItems();
-    //        return true;
-    //    }
-
-    //    if (key == juce::KeyPress('z', juce::ModifierKeys::commandModifier, 0))
-    //    {
-    //        undoManager.undo();
-    //        return true;
-    //    }
-
-    //    if (key == juce::KeyPress('z', juce::ModifierKeys::commandModifier | juce::ModifierKeys::shiftModifier, 0))
-    //    {
-    //        undoManager.redo();
-    //        return true;
-    //    }
-
-    //    return Component::keyPressed(key);
-    //};
 
 private:
     juce::ValueTree createTree(const juce::String& desc)
@@ -261,10 +196,8 @@ private:
     }
 
     juce::TreeView tree;
-    //juce::TextButton undoButton{ "Undo" },
-    //    redoButton{ "Redo" };
 
-    std::unique_ptr<ValueTreeItem> rootItem;
+    std::unique_ptr<TaskQueueItem> rootItem;
     juce::UndoManager undoManager;
 
     juce::Colour olive{ 84u, 94u, 80u };
@@ -279,7 +212,7 @@ private:
         undoManager.beginNewTransaction();
     }
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ValueTreesDemo)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TaskQueueContainer)
 };
 class MainComponent  : public juce::Component
 {
@@ -302,7 +235,7 @@ private:
     //==============================================================================
     // Your private member variables go here...
 
-    ValueTreesDemo valueTreesDemo;
+    TaskQueueContainer taskQueueContainer;
 
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
