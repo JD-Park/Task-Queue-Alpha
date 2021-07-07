@@ -22,12 +22,13 @@
 struct TaskQueueItem : public juce::TreeViewItem,
     private juce::ValueTree::Listener
 {
-public:
     TaskQueueItem(const juce::ValueTree& v, juce::UndoManager& um);
 
     juce::String getUniqueName() const override;
 
     bool mightContainSubItems() override;
+
+    void addChild(const juce::ValueTree& childToAdd);
 
     void paintItem(juce::Graphics& g, int width, int height) override;
 

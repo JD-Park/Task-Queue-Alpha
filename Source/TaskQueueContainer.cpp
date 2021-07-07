@@ -14,6 +14,8 @@
 TaskQueueContainer::TaskQueueContainer()
 {
     addAndMakeVisible(tree);
+    addAndMakeVisible(addTaskButton);
+    addAndMakeVisible(addSubTaskButton);
 
     tree.setDefaultOpenness(true);
     tree.setMultiSelectEnabled(true);
@@ -22,11 +24,21 @@ TaskQueueContainer::TaskQueueContainer()
 
     startTimer(500);
 
+    addTaskButton.onClick = [this]()
+    {
+        static int counter = 0;
+        ValueTree task{ "Task" };
+        task.setProperty("name", "Task " + String(counter++), & undoManager);
+
+        rootItem->addChild(task);
+    };
+
     setSize(500, 500);
 }
 
 TaskQueueContainer::~TaskQueueContainer()
 {
+    stopTimer();
     tree.setRootItem(nullptr);
 }
 
@@ -37,9 +49,20 @@ void TaskQueueContainer::paint(juce::Graphics& g)
 
 void TaskQueueContainer::resized()
 {
-    auto r = getLocalBounds().reduced(8);
+    //auto r = getLocalBounds().reduced(8);
 
-    tree.setBounds(r);
+    //tree.setBounds(r);
+    auto bounds = getLocalBounds();
+    tree.setBounds(bounds.removeFromTop(getHeight() * 0.9));
+
+    FlexBox fB;
+    fB.flexDirection = FlexBox::Direction::row;
+    fB.alignItems = FlexBox::AlignItems::stretch;
+
+    fB.items.add(FlexItem(addTaskButton).withFlex(1));
+    fB.items.add(FlexItem(addSubTaskButton).withFlex(1));
+
+    fB.performLayout(bounds);
 }
 
 juce::ValueTree TaskQueueContainer::createRootValueTree()
