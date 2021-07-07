@@ -14,6 +14,7 @@
 #include "TaskQueueItem.h"
 
 struct TaskQueueItem;
+using namespace juce;
 //==============================================================================
 /*
     This component lives inside our window, and this is where you should put all
@@ -48,8 +49,10 @@ private:
     juce::Colour brown{ 66u, 48u, 36u };
     juce::Colour sand{ 156u, 130u, 107u };
 
-
     void timerCallback() override;
+
+    TextButton addTaskButton{ "Add Task" };
+    TextButton addSubTaskButton{ "Add Sub-Task" };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TaskQueueContainer)
 };

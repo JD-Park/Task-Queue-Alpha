@@ -26,6 +26,11 @@ bool TaskQueueItem::mightContainSubItems()
     return tree.getNumChildren() > 0;
 }
 
+void TaskQueueItem::addChild(const ValueTree &childToAdd)
+{
+    tree.addChild(childToAdd, -1, &undoManager);
+}
+
 void TaskQueueItem::paintItem(juce::Graphics& g, int width, int height) 
 {
     if (isSelected())
