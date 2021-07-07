@@ -30,17 +30,17 @@ public:
 
     void paintItem(juce::Graphics& g, int width, int height) override
     {
-        /*if (isSelected())
-            g.fillAll(getUIColourIfAvailable(juce::LookAndFeel_V4::ColourScheme::UIColour::highlightedFill,
-                g.setColour(juce::Colours::teal)));
+        if (isSelected())
+        {
+            g.fillAll(olive);
+        }
 
-        g.setColour(getUIColourIfAvailable(LookAndFeel_V4::ColourScheme::UIColour::defaultText,
-            Colours::black));
+        g.setColour(sand);
         g.setFont(15.0f);
 
         g.drawText(tree["name"].toString(),
             4, 0, width - 4, height,
-            Justification::centredLeft, true);*/
+            juce::Justification::centredLeft, true);
     }
 
     void itemOpennessChanged(bool isNowOpen) override
@@ -134,6 +134,13 @@ private:
         }
     }
 
+    juce::Colour olive{ 84u, 94u, 80u };
+    juce::Colour olive2{ 62u, 71u, 61u };
+    juce::Colour darkG{ 48u, 52u, 49u };
+    juce::Colour brown{ 66u, 48u, 36u };
+    juce::Colour sand{ 156u, 130u, 107u };
+
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ValueTreeItem)
 };
 
@@ -152,10 +159,10 @@ public:
         rootItem.reset(new ValueTreeItem(createRootValueTree(), undoManager));
         tree.setRootItem(rootItem.get());
 
-        addAndMakeVisible(undoButton);
-        addAndMakeVisible(redoButton);
-        undoButton.onClick = [this] { undoManager.undo(); };
-        redoButton.onClick = [this] { undoManager.redo(); };
+        //addAndMakeVisible(undoButton);
+        //addAndMakeVisible(redoButton);
+        //undoButton.onClick = [this] { undoManager.undo(); };
+        //redoButton.onClick = [this] { undoManager.redo(); };
 
         startTimer(500);
 
@@ -169,95 +176,103 @@ public:
 
     void paint(juce::Graphics& g) override
     {
-        /*g.fillAll(getUIColourIfAvailable(LookAndFeel_V4::ColourScheme::UIColour::windowBackground));*/
+        g.fillAll(darkG);
     }
 
     void resized() override
     {
         auto r = getLocalBounds().reduced(8);
 
-        auto buttons = r.removeFromBottom(22);
-        undoButton.setBounds(buttons.removeFromLeft(100));
-        buttons.removeFromLeft(6);
-        redoButton.setBounds(buttons.removeFromLeft(100));
+        //auto buttons = r.removeFromBottom(22);
+        //undoButton.setBounds(buttons.removeFromLeft(100));
+        //buttons.removeFromLeft(6);
+        //redoButton.setBounds(buttons.removeFromLeft(100));
 
-        r.removeFromBottom(4);
+        //r.removeFromBottom(4);
         tree.setBounds(r);
     }
 
-    static juce::ValueTree createTree(const juce::String& desc)
+    juce::ValueTree createRootValueTree()
+    {
+        //auto vt = createTree("This demo displays a ValueTree as a treeview.");
+        //vt.appendChild(createTree("You can drag around the nodes to rearrange them"), nullptr);
+        //vt.appendChild(createTree("..and press 'delete' or 'backspace' to delete them"), nullptr);
+        //vt.appendChild(createTree("Then, you can use the undo/redo buttons to undo these changes"), nullptr);
+
+        //int n = 1;
+        //vt.appendChild(createRandomTree(n, 0), nullptr);
+
+        auto vt = createTree("Task Queue Tree");
+        return vt;
+    }
+
+    //static juce::ValueTree createRandomTree(int& counter, int depth)
+    //{
+    //    auto t = createTree("Item " + juce::String(counter++));
+
+    //    if (depth < 3)
+    //        for (int i = 1 + juce::Random::getSystemRandom().nextInt(7); --i >= 0;)
+    //            t.appendChild(createRandomTree(counter, depth + 1), nullptr);
+
+    //    return t;
+    //}
+
+    //void deleteSelectedItems()
+    //{
+    //    juce::OwnedArray<juce::ValueTree> selectedItems;
+    //    ValueTreeItem::getSelectedTreeViewItems(tree, selectedItems);
+
+    //    for (auto* v : selectedItems)
+    //    {
+    //        if (v->getParent().isValid())
+    //            v->getParent().removeChild(*v, &undoManager);
+    //    }
+    //}
+
+    //bool keyPressed(const juce::KeyPress& key) override
+    //{
+    //    if (key == juce::KeyPress::deleteKey || key == juce::KeyPress::backspaceKey)
+    //    {
+    //        deleteSelectedItems();
+    //        return true;
+    //    }
+
+    //    if (key == juce::KeyPress('z', juce::ModifierKeys::commandModifier, 0))
+    //    {
+    //        undoManager.undo();
+    //        return true;
+    //    }
+
+    //    if (key == juce::KeyPress('z', juce::ModifierKeys::commandModifier | juce::ModifierKeys::shiftModifier, 0))
+    //    {
+    //        undoManager.redo();
+    //        return true;
+    //    }
+
+    //    return Component::keyPressed(key);
+    //};
+
+private:
+    juce::ValueTree createTree(const juce::String& desc)
     {
         juce::ValueTree t("Item");
         t.setProperty("name", desc, nullptr);
         return t;
     }
 
-    static juce::ValueTree createRootValueTree()
-    {
-        auto vt = createTree("This demo displays a ValueTree as a treeview.");
-        vt.appendChild(createTree("You can drag around the nodes to rearrange them"), nullptr);
-        vt.appendChild(createTree("..and press 'delete' or 'backspace' to delete them"), nullptr);
-        vt.appendChild(createTree("Then, you can use the undo/redo buttons to undo these changes"), nullptr);
-
-        int n = 1;
-        vt.appendChild(createRandomTree(n, 0), nullptr);
-
-        return vt;
-    }
-
-    static juce::ValueTree createRandomTree(int& counter, int depth)
-    {
-        auto t = createTree("Item " + juce::String(counter++));
-
-        if (depth < 3)
-            for (int i = 1 + juce::Random::getSystemRandom().nextInt(7); --i >= 0;)
-                t.appendChild(createRandomTree(counter, depth + 1), nullptr);
-
-        return t;
-    }
-
-    void deleteSelectedItems()
-    {
-        juce::OwnedArray<juce::ValueTree> selectedItems;
-        ValueTreeItem::getSelectedTreeViewItems(tree, selectedItems);
-
-        for (auto* v : selectedItems)
-        {
-            if (v->getParent().isValid())
-                v->getParent().removeChild(*v, &undoManager);
-        }
-    }
-
-    bool keyPressed(const juce::KeyPress& key) override
-    {
-        if (key == juce::KeyPress::deleteKey || key == juce::KeyPress::backspaceKey)
-        {
-            deleteSelectedItems();
-            return true;
-        }
-
-        if (key == juce::KeyPress('z', juce::ModifierKeys::commandModifier, 0))
-        {
-            undoManager.undo();
-            return true;
-        }
-
-        if (key == juce::KeyPress('z', juce::ModifierKeys::commandModifier | juce::ModifierKeys::shiftModifier, 0))
-        {
-            undoManager.redo();
-            return true;
-        }
-
-        return Component::keyPressed(key);
-    }
-
-private:
     juce::TreeView tree;
-    juce::TextButton undoButton{ "Undo" },
-        redoButton{ "Redo" };
+    //juce::TextButton undoButton{ "Undo" },
+    //    redoButton{ "Redo" };
 
     std::unique_ptr<ValueTreeItem> rootItem;
     juce::UndoManager undoManager;
+
+    juce::Colour olive{ 84u, 94u, 80u };
+    juce::Colour olive2{ 62u, 71u, 61u };
+    juce::Colour darkG{ 48u, 52u, 49u };
+    juce::Colour brown{ 66u, 48u, 36u };
+    juce::Colour sand{ 156u, 130u, 107u };
+
 
     void timerCallback() override
     {
@@ -277,9 +292,17 @@ public:
     void paint (juce::Graphics&) override;
     void resized() override;
 
+    juce::Colour olive{ 84u, 94u, 80u };
+    juce::Colour olive2{ 62u, 71u, 61u };
+    juce::Colour darkG{ 48u, 52u, 49u };
+    juce::Colour brown{ 66u, 48u, 36u };
+    juce::Colour sand{ 156u, 130u, 107u };
+
 private:
     //==============================================================================
     // Your private member variables go here...
+
+    ValueTreesDemo valueTreesDemo;
 
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
