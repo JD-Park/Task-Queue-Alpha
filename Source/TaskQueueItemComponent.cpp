@@ -9,10 +9,11 @@
 */
 
 #include "TaskQueueItemComponent.h"
+#include "TaskQueueItem.h"
 
 using namespace juce;
 
-TaskQueueItemComponent::TaskQueueItemComponent(const ValueTree& t) : tree(t)
+TaskQueueItemComponent::TaskQueueItemComponent(const ValueTree& t, TaskQueueItem& o) : tree(t), owner(o)
 {
     tree.addListener(this);
 }
@@ -20,7 +21,11 @@ TaskQueueItemComponent::TaskQueueItemComponent(const ValueTree& t) : tree(t)
 void TaskQueueItemComponent::paint(Graphics& g)
 {
     //g.fillAll(Colours::black);
-    g.fillAll(tree["selected"].equals(true) ? olive : darkG);
+    // 
+    //Wrong way to select
+    //g.fillAll(tree["selected"].equals(true) ? olive : darkG);
+    
+    g.fillAll(owner.isSelected() ? olive : darkG);
     g.setColour(olive2);
     g.fillRect(getLocalBounds().reduced(2));
 
@@ -28,11 +33,34 @@ void TaskQueueItemComponent::paint(Graphics& g)
     g.drawFittedText(tree["name"].toString(), getLocalBounds().reduced(2), Justification::centred, 1);
 }
 
-void TaskQueueItemComponent::valueTreePropertyChanged(ValueTree& treeThatChanged, const Identifier& indentifier)
+void TaskQueueItemComponent::valueTreePropertyChanged(ValueTree& treeThatChanged, const Identifier& identifier)
 {
     if (treeThatChanged == tree)
     {
         repaint();
+    }
+}
+
+void TaskQueueItemComponent::mouseDown(const MouseEvent& e)
+{
+    //Wrong way to select
+    /*tree.setProperty("selected", !tree["selected"].operator bool(), nullptr);*/
+
+    owner.setSelected(!owner.isSelected(), true);
+}
+
+void TaskQueueItemComponent::mouseDrag(const MouseEvent& e)
+{
+    if (e.mouseWasDraggedSinceMouseDown())
+    {
+        owner.setSelected(true, true);
+        if (auto* dragContainer =  DragAndDropContainer::findParentDragContainerFor(this))
+        {
+            if (!dragContainer->isDragAndDropActive())
+            {
+                dragContainer->startDragging(owner.getDragSourceDescription(), this);
+            }
+        }
     }
 }
 

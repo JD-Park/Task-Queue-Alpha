@@ -29,17 +29,20 @@ bool TaskQueueItem::mightContainSubItems()
 
 Component* TaskQueueItem::createItemComponent()
 {
-    return new TaskQueueItemComponent(tree);
+    return new TaskQueueItemComponent(tree, *this);
 }
 
 void TaskQueueItem::addChild(const ValueTree& childToAdd)
 {
-    for (auto child : tree)
-    {
-        child.setProperty("selected", false, nullptr);
-    }
+    //Wrong way to select
+    //for (auto child : tree)
+    //{
+    //    child.setProperty("selected", false, nullptr);
+    //}
 
-    tree.setProperty("selected", false, nullptr);
+    //tree.setProperty("selected", false, nullptr);
+
+    setSelected(false, true);
     
     tree.addChild(childToAdd, -1, &undoManager);
 }
@@ -82,7 +85,22 @@ void TaskQueueItem::itemDropped(const juce::DragAndDropTarget::SourceDetails&, i
     juce::OwnedArray<juce::ValueTree> selectedTrees;
     getSelectedTreeViewItems(*getOwnerView(), selectedTrees);
 
+    jassert(selectedTrees.size() == 1);
+    auto movedTree = dynamic_cast<TaskQueueItem*>(getOwnerView()->getSelectedItem(0))->tree;
+
     moveItems(*getOwnerView(), selectedTrees, tree, insertIndex, undoManager);
+
+    for (int i = 0; i < getNumSubItems(); ++i)
+    {
+        if (auto* node = dynamic_cast<TaskQueueItem*>(getSubItem(i)))
+        {
+            if (node->tree == movedTree)
+            {
+                node->setSelected(true, true);
+                //break;
+            }
+        }
+    }
 }
 
 void TaskQueueItem::moveItems(juce::TreeView& treeView, const juce::OwnedArray<juce::ValueTree>& items,
@@ -126,9 +144,20 @@ void TaskQueueItem::refreshSubItems()
         addSubItem(new TaskQueueItem(tree.getChild(i), undoManager));
 }
 
-void TaskQueueItem::valueTreePropertyChanged(juce::ValueTree&, const juce::Identifier&)
+void TaskQueueItem::valueTreePropertyChanged(juce::ValueTree& treeThatChanged, const juce::Identifier& identifier) 
 {
     //repaintItem();
+    // Wrong way to select items
+    //if (identifier == Identifier("selected") && treeThatChanged.isAChildOf(tree))
+    //{
+    //    for (auto child : tree)
+    //    {
+    //        if( child != treeThatChanged)
+    //        {
+    //            child.setProperty("selected", false, nullptr);
+    //        }
+    //    }
+    //}
 }
 
 void TaskQueueItem::valueTreeChildAdded(juce::ValueTree& parentTree, juce::ValueTree&) { treeChildrenChanged(parentTree); }

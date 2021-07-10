@@ -18,7 +18,7 @@ TaskQueueContainer::TaskQueueContainer()
     addAndMakeVisible(addSubTaskButton);
 
     tree.setDefaultOpenness(true);
-    tree.setMultiSelectEnabled(true);
+    tree.setMultiSelectEnabled(false);
     rootItem.reset(new TaskQueueItem(createTree("Task Queue Tree"), undoManager));
     tree.setRootItem(rootItem.get());
 
@@ -29,9 +29,15 @@ TaskQueueContainer::TaskQueueContainer()
         static int counter = 0;
         ValueTree task{ "Task" };
         task.setProperty("name", "Task " + String(counter++), & undoManager);
-        task.setProperty("selected", true, nullptr);
+        
+        //Wrong way to select
+        //task.setProperty("selected", true, nullptr);
 
-        rootItem->addChild(task);
+        if (rootItem)
+        {
+            rootItem->addChild(task);
+            rootItem->getSubItem(rootItem->getNumSubItems() - 1)->setSelected(true, false);
+        }
     };
 
     setSize(500, 500);

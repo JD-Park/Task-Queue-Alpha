@@ -11,18 +11,24 @@
 #pragma once
 
 #include "JuceHeader.h"
+#include "TaskQueueItem.h"
 using namespace juce;
 
+struct TaskQueueItem;
 struct TaskQueueItemComponent : Component, ValueTree::Listener
 {
-    TaskQueueItemComponent(const ValueTree& t);
+    TaskQueueItemComponent(const ValueTree& t, TaskQueueItem& o);
     void paint(Graphics& g) override;
 
-    void valueTreePropertyChanged(juce::ValueTree& treeThatChanged, const Identifier& indentifier) override;
+    void valueTreePropertyChanged(juce::ValueTree& treeThatChanged, const Identifier& identifier) override;
+
+    void mouseDown(const MouseEvent& e) override;
+    void mouseDrag(const MouseEvent& e) override;
 
 
 private:
     ValueTree tree;
+    TaskQueueItem& owner;
 
     juce::Colour olive{ 84u, 94u, 80u };
     juce::Colour olive2{ 62u, 71u, 61u };
