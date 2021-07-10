@@ -62,6 +62,7 @@ void TaskQueueContainer::resized()
     auto bounds = getLocalBounds();
     tree.setBounds(bounds.removeFromTop(getHeight() * 0.9));
 
+}
     FlexBox fB;
     fB.flexDirection = FlexBox::Direction::row;
     fB.alignItems = FlexBox::AlignItems::stretch;
@@ -70,7 +71,6 @@ void TaskQueueContainer::resized()
     fB.items.add(FlexItem(addSubTaskButton).withFlex(1));
 
     fB.performLayout(bounds);
-}
 
 //juce::ValueTree TaskQueueContainer::createRootValueTree()
 //{
