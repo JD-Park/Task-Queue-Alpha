@@ -4,6 +4,10 @@
               addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1" cppLanguageStandard="17">
   <MAINGROUP id="ufAX5A" name="Task Queue Alpha">
     <GROUP id="{0B925587-A197-C24D-327A-91E98DD0DEF2}" name="Source">
+      <FILE id="x2aRTL" name="TaskQueueItemComponent.cpp" compile="1" resource="0"
+            file="Source/TaskQueueItemComponent.cpp"/>
+      <FILE id="OxUvyK" name="TaskQueueItemComponent.h" compile="0" resource="0"
+            file="Source/TaskQueueItemComponent.h"/>
       <FILE id="eiBWcZ" name="TaskQueueContainer.cpp" compile="1" resource="0"
             file="Source/TaskQueueContainer.cpp"/>
       <FILE id="LErbSo" name="TaskQueueItem.cpp" compile="1" resource="0"

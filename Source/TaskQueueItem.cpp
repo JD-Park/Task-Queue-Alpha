@@ -9,6 +9,7 @@
 */
 
 #include "TaskQueueItem.h"
+#include "TaskQueueItemComponent.h"
 
 TaskQueueItem::TaskQueueItem (const juce::ValueTree& v, juce::UndoManager& um)
     : tree(v), undoManager(um)
@@ -26,25 +27,37 @@ bool TaskQueueItem::mightContainSubItems()
     return tree.getNumChildren() > 0;
 }
 
-void TaskQueueItem::addChild(const ValueTree &childToAdd)
+Component* TaskQueueItem::createItemComponent()
 {
+    return new TaskQueueItemComponent(tree);
+}
+
+void TaskQueueItem::addChild(const ValueTree& childToAdd)
+{
+    for (auto child : tree)
+    {
+        child.setProperty("selected", false, nullptr);
+    }
+
+    tree.setProperty("selected", false, nullptr);
+    
     tree.addChild(childToAdd, -1, &undoManager);
 }
 
-void TaskQueueItem::paintItem(juce::Graphics& g, int width, int height) 
-{
-    if (isSelected())
-    {
-        g.fillAll(olive);
-    }
-
-    g.setColour(sand);
-    g.setFont(15.0f);
-
-    g.drawText(tree["name"].toString(),
-        4, 0, width - 4, height,
-        juce::Justification::centredLeft, true);
-}
+//void TaskQueueItem::paintItem(juce::Graphics& g, int width, int height) 
+//{
+//    if (isSelected())
+//    {
+//        g.fillAll(olive);
+//    }
+//
+//    g.setColour(sand);
+//    g.setFont(15.0f);
+//
+//    g.drawText(tree["name"].toString(),
+//        4, 0, width - 4, height,
+//        juce::Justification::centredLeft, true);
+//}
 
 void TaskQueueItem::itemOpennessChanged(bool isNowOpen) 
 {
@@ -115,7 +128,7 @@ void TaskQueueItem::refreshSubItems()
 
 void TaskQueueItem::valueTreePropertyChanged(juce::ValueTree&, const juce::Identifier&)
 {
-    repaintItem();
+    //repaintItem();
 }
 
 void TaskQueueItem::valueTreeChildAdded(juce::ValueTree& parentTree, juce::ValueTree&) { treeChildrenChanged(parentTree); }

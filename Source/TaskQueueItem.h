@@ -28,9 +28,13 @@ struct TaskQueueItem : public juce::TreeViewItem,
 
     bool mightContainSubItems() override;
 
+    juce::Component* createItemComponent() override;
+
+    int getItemHeight() const override { return 30; }
+
     void addChild(const juce::ValueTree& childToAdd);
 
-    void paintItem(juce::Graphics& g, int width, int height) override;
+    //void paintItem(juce::Graphics& g, int width, int height) override;
 
     void itemOpennessChanged(bool isNowOpen) override;
 

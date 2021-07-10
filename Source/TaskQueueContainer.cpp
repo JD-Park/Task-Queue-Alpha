@@ -19,7 +19,7 @@ TaskQueueContainer::TaskQueueContainer()
 
     tree.setDefaultOpenness(true);
     tree.setMultiSelectEnabled(true);
-    rootItem.reset(new TaskQueueItem(createRootValueTree(), undoManager));
+    rootItem.reset(new TaskQueueItem(createTree("Task Queue Tree"), undoManager));
     tree.setRootItem(rootItem.get());
 
     startTimer(500);
@@ -29,6 +29,7 @@ TaskQueueContainer::TaskQueueContainer()
         static int counter = 0;
         ValueTree task{ "Task" };
         task.setProperty("name", "Task " + String(counter++), & undoManager);
+        task.setProperty("selected", true, nullptr);
 
         rootItem->addChild(task);
     };
@@ -65,11 +66,11 @@ void TaskQueueContainer::resized()
     fB.performLayout(bounds);
 }
 
-juce::ValueTree TaskQueueContainer::createRootValueTree()
-{
-    auto vt = createTree("Task Queue Tree");
-    return vt;
-}
+//juce::ValueTree TaskQueueContainer::createRootValueTree()
+//{
+//    auto vt = createTree("Task Queue Tree");
+//    return vt;
+//}
 
 juce::ValueTree TaskQueueContainer::createTree(const juce::String& desc)
 {
