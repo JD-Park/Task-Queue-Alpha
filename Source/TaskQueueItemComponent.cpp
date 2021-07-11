@@ -18,7 +18,18 @@ TaskQueueItemComponent::TaskQueueItemComponent(const ValueTree& t, TaskQueueItem
     tree.addListener(this);
 
     addAndMakeVisible(label);
-    label.getTextValue().referTo(tree.getPropertyAsValue("name", &owner.getUndoManager()));
+    if (tree.getNumChildren() > 0)
+    {
+        label.setText(tree["name"].toString() + " " + getNumCompleted(), dontSendNotification);
+        label.onTextChange = [this]()
+        {
+            tree.setProperty("name", label.getText(), &owner.getUndoManager());
+        };
+    }
+    else
+    {
+        label.getTextValue().referTo(tree.getPropertyAsValue("name", &owner.getUndoManager()));
+    }
     label.setJustificationType(Justification::centred);
     label.setColour(Label::ColourIds::textColourId, sand);
     label.setInterceptsMouseClicks(false, false);
@@ -49,7 +60,8 @@ void TaskQueueItemComponent::resized()
 {
     auto bounds = getLocalBounds().reduced(2);
     
-    completedButton.setBounds(bounds.getX(), bounds.getY(), bounds.getWidth(), bounds.getHeight());
+    completedButton.setBounds(bounds.getX(), bounds.getY(), bounds.getHeight(), bounds.getHeight());
+    bounds.removeFromLeft(bounds.getHeight() + 2);
     label.setBounds(bounds);
 }
 
@@ -57,7 +69,11 @@ void TaskQueueItemComponent::valueTreePropertyChanged(ValueTree& treeThatChanged
 {
     if (treeThatChanged == tree)
     {
-        repaint();
+        //repaint();
+        if (identifier == Identifier("name"))
+        {
+            label.setText(tree["name"].toString() + " " + getNumCompleted(), dontSendNotification);
+        }
     }
 }
 
@@ -87,5 +103,11 @@ void TaskQueueItemComponent::mouseDrag(const MouseEvent& e)
 void TaskQueueItemComponent::mouseDoubleClick(const MouseEvent& e)
 {
     label.showEditor();
+}
+
+String TaskQueueItemComponent::getNumCompleted()
+{
+    jassert(tree.getNumChildren() > 0);
+    return "(0 / 0)";
 }
 
