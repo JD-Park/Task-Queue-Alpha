@@ -18,9 +18,8 @@ TaskQueueItemComponent::TaskQueueItemComponent(const ValueTree& t, TaskQueueItem
     tree.addListener(this);
 
     addAndMakeVisible(label);
-    if (tree.getNumChildren() > 0)
+    /*if (tree.getNumChildren() > 0)
     {
-        label.setText(tree["name"].toString() + " " + getNumCompleted(), dontSendNotification);
         label.onTextChange = [this]()
         {
             tree.setProperty("name", label.getText(), &owner.getUndoManager());
@@ -29,7 +28,9 @@ TaskQueueItemComponent::TaskQueueItemComponent(const ValueTree& t, TaskQueueItem
     else
     {
         label.getTextValue().referTo(tree.getPropertyAsValue("name", &owner.getUndoManager()));
-    }
+    }*/
+    updateLabelBehav();
+    updateLabelText();
     label.setJustificationType(Justification::centred);
     label.setColour(Label::ColourIds::textColourId, sand);
     label.setInterceptsMouseClicks(false, false);
@@ -67,14 +68,31 @@ void TaskQueueItemComponent::resized()
 
 void TaskQueueItemComponent::valueTreePropertyChanged(ValueTree& treeThatChanged, const Identifier& identifier)
 {
-    if (treeThatChanged == tree)
-    {
+    /*if (treeThatChanged == tree)
+    {*/
         //repaint();
-        if (identifier == Identifier("name"))
+        /*if (identifier == Identifier("name"))
         {
-            label.setText(tree["name"].toString() + " " + getNumCompleted(), dontSendNotification);
-        }
-    }
+            if (tree.getNumChildren() > 0)
+            {
+                updateLabelText();
+            }
+        }*/
+        //}
+    repaint();
+    updateLabelText();
+}
+
+void TaskQueueItemComponent::valueTreeChildAdded(juce::ValueTree& parentTree, juce::ValueTree&)
+{
+    updateLabelBehav();
+    updateLabelText();
+}
+
+void TaskQueueItemComponent::valueTreeChildRemoved(juce::ValueTree& parentTree, juce::ValueTree&, int)
+{
+    updateLabelBehav();
+    updateLabelText();
 }
 
 void TaskQueueItemComponent::mouseDown(const MouseEvent& e)
@@ -90,7 +108,7 @@ void TaskQueueItemComponent::mouseDrag(const MouseEvent& e)
     if (e.mouseWasDraggedSinceMouseDown())
     {
         owner.setSelected(true, true);
-        if (auto* dragContainer =  DragAndDropContainer::findParentDragContainerFor(this))
+        if (auto* dragContainer = DragAndDropContainer::findParentDragContainerFor(this))
         {
             if (!dragContainer->isDragAndDropActive())
             {
@@ -105,9 +123,82 @@ void TaskQueueItemComponent::mouseDoubleClick(const MouseEvent& e)
     label.showEditor();
 }
 
+void completedCalculator(ValueTree tree, int& numChildren, int& numCompleted)
+{
+    numChildren += tree.getNumChildren();
+
+    for (int i = 0; i < tree.getNumChildren(); ++i)
+    {
+        auto child = tree.getChild(i);
+        if (child["completed"].equals(true))
+        {
+            ++numCompleted;
+        }
+
+        if (child.getNumChildren() > 0)
+        {
+            completedCalculator(child, numChildren, numCompleted);
+        }
+    }
+}
+
 String TaskQueueItemComponent::getNumCompleted()
 {
     jassert(tree.getNumChildren() > 0);
-    return "(0 / 0)";
+    int numChildren = 0;
+    int numCompleted = 0;
+
+    completedCalculator(tree, numChildren, numCompleted);
+    String str;
+    str << "(" << numCompleted << " / " << numChildren << ")";
+    return str;
 }
+
+void TaskQueueItemComponent::updateLabelText()
+{
+    if (tree.getNumChildren() > 0)
+    {
+        label.setText(tree["name"].toString() + " " + getNumCompleted(), dontSendNotification);
+    }
+    else
+    {
+        label.setText(tree["name"].toString(), dontSendNotification);
+    }
+}
+
+void TaskQueueItemComponent::updateLabelBehav()
+{
+    label.onTextChange = [this]()
+    {
+        tree.setProperty("name", label.getText(), &owner.getUndoManager());
+    };
+
+    label.onEditorShow = [this]()
+    {
+        String text = label.getText();
+        if (text.contains("("))
+        {
+            text = label.getText().substring(0, label.getText().indexOf("(")).trimEnd();
+        }
+        label.getCurrentTextEditor()->setText(text);
+        label.getCurrentTextEditor()->selectAll();
+    };
+// if (tree.getNumChildren() > 0)
+//    {
+//        label.onTextChange = [this]()
+//        {
+//            tree.setProperty("name", label.getText(), &owner.getUndoManager());
+//        };
+//
+//       /* auto text = label.getText();
+//        Value textValue(text);
+//        label.getTextValue().referTo(textValue);*/
+//    }
+//    /*else
+//    {
+//        label.onTextChange = nullptr;
+//        label.getTextValue().referTo(tree.getPropertyAsValue("name", &owner.getUndoManager()));
+//    }*/
+}
+
 

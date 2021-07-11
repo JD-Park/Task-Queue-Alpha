@@ -27,15 +27,15 @@ TaskQueueContainer::TaskQueueContainer()
     addTaskButton.onClick = [this]()
     {
         static int counter = 0;
-        ValueTree task{ "Task" };
-        task.setProperty("name", "Task " + String(counter++), &undoManager);
+        //ValueTree task{ "Task" };
+        //task.setProperty("name", "Task " + String(counter++), &undoManager);
 
         //Wrong way to select
         //task.setProperty("selected", true, nullptr);
 
         if (rootItem)
         {
-            rootItem->addChild(task);
+            rootItem->addChild(createTree("Task" + String(counter++)));
             rootItem->getSubItem(rootItem->getNumSubItems() - 1)->setSelected(true, false);
         }
     };
@@ -50,7 +50,8 @@ TaskQueueContainer::TaskQueueContainer()
         if (auto* tqi = dynamic_cast<TaskQueueItem*>(tree.getSelectedItem(0)))
         {
             tqi->addChild(createTree("Sub Task"));
-            tqi->getSubItem(tqi->getNumSubItems() -1)->setSelected(true, true);
+            //tqi->getSubItem(tqi->getNumSubItems() -1)->setSelected(true, true);
+            tqi->setSelected(true, true);
         }
     };
 

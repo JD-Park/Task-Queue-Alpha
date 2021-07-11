@@ -21,6 +21,8 @@ struct TaskQueueItemComponent : Component, ValueTree::Listener
     void paint(Graphics& g) override;
 
     void valueTreePropertyChanged(juce::ValueTree& treeThatChanged, const Identifier& identifier) override;
+    void valueTreeChildAdded(juce::ValueTree& parentTree, juce::ValueTree&) override;
+    void valueTreeChildRemoved(juce::ValueTree& parentTree, juce::ValueTree&, int) override;
 
     void mouseDown(const MouseEvent& e) override;
     void mouseDrag(const MouseEvent& e) override;
@@ -35,6 +37,8 @@ private:
     TaskQueueItem& owner;
     Label label;
     ToggleButton completedButton;
+    void updateLabelText();
+    void updateLabelBehav();
     //String getNumCompleted;
 
     juce::Colour olive{ 84u, 94u, 80u };
