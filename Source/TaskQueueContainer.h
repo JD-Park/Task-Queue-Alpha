@@ -12,7 +12,32 @@
 
 #include <JuceHeader.h>
 #include "TaskQueueItem.h"
+using namespace juce;
 
+//==============================================================================
+struct SelectionMonitor : public Timer
+{
+    SelectionMonitor(TreeView& t, std::function<void(bool)> f) : treeView(t), f(std::move(f))
+    {
+        startTimerHz(20);
+    }
+    ~SelectionMonitor() { stopTimer(); }
+
+    void timerCallback() override
+    {
+        if (f)
+        {
+            f(treeView.getNumSelectedItems() > 0);
+        }
+    }
+
+private:
+    TreeView& treeView;
+    std::function<void(bool)> f;
+};
+
+
+//==============================================================================
 struct TaskQueueItem;
 using namespace juce;
 //==============================================================================
@@ -53,6 +78,8 @@ private:
 
     TextButton addTaskButton{ "Add Task" };
     TextButton addSubTaskButton{ "Add Sub-Task" };
+
+    std::unique_ptr<SelectionMonitor> selectionMonitor;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TaskQueueContainer)
 };

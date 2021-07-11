@@ -28,8 +28,8 @@ TaskQueueContainer::TaskQueueContainer()
     {
         static int counter = 0;
         ValueTree task{ "Task" };
-        task.setProperty("name", "Task " + String(counter++), & undoManager);
-        
+        task.setProperty("name", "Task " + String(counter++), &undoManager);
+
         //Wrong way to select
         //task.setProperty("selected", true, nullptr);
 
@@ -37,6 +37,20 @@ TaskQueueContainer::TaskQueueContainer()
         {
             rootItem->addChild(task);
             rootItem->getSubItem(rootItem->getNumSubItems() - 1)->setSelected(true, false);
+        }
+    };
+
+    selectionMonitor = std::make_unique<SelectionMonitor>(tree, [this](bool somethingIsSelected)
+        {
+            this->addSubTaskButton.setEnabled(somethingIsSelected);
+        });
+
+    addSubTaskButton.onClick = [this]()
+    {
+        if (auto* tqi = dynamic_cast<TaskQueueItem*>(tree.getSelectedItem(0)))
+        {
+            tqi->addChild(createTree("Sub Task"));
+            tqi->setSelected(true, true);
         }
     };
 
@@ -90,7 +104,6 @@ juce::ValueTree TaskQueueContainer::createTree(const juce::String& desc)
 //juce::Colour darkG{ 48u, 52u, 49u };
 //juce::Colour brown{ 66u, 48u, 36u };
 //juce::Colour sand{ 156u, 130u, 107u };
-
 
 void TaskQueueContainer::timerCallback()
 {
