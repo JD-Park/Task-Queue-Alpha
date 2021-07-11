@@ -24,13 +24,14 @@ struct TaskQueueItemComponent : Component, ValueTree::Listener
 
     void mouseDown(const MouseEvent& e) override;
     void mouseDrag(const MouseEvent& e) override;
+    void mouseDoubleClick(const MouseEvent& e) override;
 
-    //void resized();
+    void resized();
 
 private:
     ValueTree tree;
     TaskQueueItem& owner;
-    //Label label;
+    Label label;
 
     juce::Colour olive{ 84u, 94u, 80u };
     juce::Colour olive2{ 62u, 71u, 61u };
