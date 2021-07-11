@@ -53,6 +53,8 @@ struct TaskQueueItem : public juce::TreeViewItem,
 
     juce::ValueTree getTree() { return tree; }
 
+    juce::UndoManager& getUndoManager() { return undoManager;}
+
 private:
     juce::ValueTree tree;
     juce::UndoManager& undoManager;

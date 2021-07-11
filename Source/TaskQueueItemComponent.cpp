@@ -16,6 +16,9 @@ using namespace juce;
 TaskQueueItemComponent::TaskQueueItemComponent(const ValueTree& t, TaskQueueItem& o) : tree(t), owner(o)
 {
     tree.addListener(this);
+
+    //addAndMakeVisible(label);
+    //label.getTextValue().referTo(tree.getPropertyAsValue("name", &owner.getUndoManager()));
 }
 
 void TaskQueueItemComponent::paint(Graphics& g)
@@ -32,6 +35,12 @@ void TaskQueueItemComponent::paint(Graphics& g)
     g.setColour(sand);
     g.drawFittedText(tree["name"].toString(), getLocalBounds().reduced(2), Justification::centred, 1);
 }
+
+//void TaskQueueItemComponent::resized()
+//{
+//    auto bounds = getLocalBounds().reduced(2);
+//    label.setBounds(bounds);
+//}
 
 void TaskQueueItemComponent::valueTreePropertyChanged(ValueTree& treeThatChanged, const Identifier& identifier)
 {

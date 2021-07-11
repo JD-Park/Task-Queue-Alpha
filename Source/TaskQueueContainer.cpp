@@ -50,7 +50,7 @@ TaskQueueContainer::TaskQueueContainer()
         if (auto* tqi = dynamic_cast<TaskQueueItem*>(tree.getSelectedItem(0)))
         {
             tqi->addChild(createTree("Sub Task"));
-            tqi->setSelected(true, true);
+            tqi->getSubItem(tqi->getNumSubItems() -1)->setSelected(true, true);
         }
     };
 
