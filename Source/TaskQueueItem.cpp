@@ -42,7 +42,7 @@ void TaskQueueItem::addChild(const ValueTree& childToAdd)
 
     //tree.setProperty("selected", false, nullptr);
 
-    setSelected(false, true);
+    //setSelected(false, true);
     
     tree.addChild(childToAdd, -1, &undoManager);
 }
@@ -83,24 +83,26 @@ bool TaskQueueItem::isInterestedInDragSource(const juce::DragAndDropTarget::Sour
 void TaskQueueItem::itemDropped(const juce::DragAndDropTarget::SourceDetails&, int insertIndex) 
 {
     juce::OwnedArray<juce::ValueTree> selectedTrees;
-    getSelectedTreeViewItems(*getOwnerView(), selectedTrees);
+    auto ownerView = getOwnerView();
+    jassert(ownerView != nullptr);
+
+    getSelectedTreeViewItems(*ownerView, selectedTrees);
 
     jassert(selectedTrees.size() == 1);
-    auto movedTree = dynamic_cast<TaskQueueItem*>(getOwnerView()->getSelectedItem(0))->tree;
+    auto movedTree = dynamic_cast<TaskQueueItem*>(ownerView->getSelectedItem(0))->tree;
 
-    moveItems(*getOwnerView(), selectedTrees, tree, insertIndex, undoManager);
+    moveItems(*ownerView, selectedTrees, tree, insertIndex, undoManager);
 
-    for (int i = 0; i < getNumSubItems(); ++i)
+    
+    if (auto* node = dynamic_cast<TaskQueueItem*>(ownerView->getRootItem()))
     {
-        if (auto* node = dynamic_cast<TaskQueueItem*>(getSubItem(i)))
+        if (auto* nodeToSelect = findTreeWith(node, movedTree))
         {
-            if (node->tree == movedTree)
-            {
-                node->setSelected(true, true);
-                //break;
-            }
+            nodeToSelect->setSelected(true, true);
         }
+
     }
+    
 }
 
 void TaskQueueItem::moveItems(juce::TreeView& treeView, const juce::OwnedArray<juce::ValueTree>& items,
@@ -134,6 +136,33 @@ void TaskQueueItem::getSelectedTreeViewItems(juce::TreeView& treeView, juce::Own
     for (int i = 0; i < numSelected; ++i)
         if (auto* vti = dynamic_cast<TaskQueueItem*> (treeView.getSelectedItem(i)))
             items.add(new juce::ValueTree(vti->tree));
+}
+
+TaskQueueItem* TaskQueueItem::findTreeWith(TaskQueueItem* node, const juce::ValueTree& treeToFind)
+{
+    if (node == nullptr)
+    {
+        return nullptr;
+    }
+
+    if (node->getTree() == treeToFind)
+    {
+        return node;
+    }
+
+    for (int i = 0; i < node->getNumSubItems(); ++i)
+    {
+        if (auto* candidate = dynamic_cast<TaskQueueItem*>(node->getSubItem(i)))
+        {
+            if (auto* result = findTreeWith(candidate, treeToFind))
+            {
+                return result;
+            }
+        }
+    }
+
+    return nullptr;
+
 }
 
 void TaskQueueItem::refreshSubItems()

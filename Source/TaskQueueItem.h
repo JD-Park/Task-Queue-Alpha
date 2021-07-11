@@ -49,6 +49,10 @@ struct TaskQueueItem : public juce::TreeViewItem,
 
     static void getSelectedTreeViewItems(juce::TreeView& treeView, juce::OwnedArray<juce::ValueTree>& items);
 
+    static TaskQueueItem* findTreeWith(TaskQueueItem* node, const juce::ValueTree& treeToFind);
+
+    juce::ValueTree getTree() { return tree; }
+
 private:
     juce::ValueTree tree;
     juce::UndoManager& undoManager;
