@@ -22,6 +22,12 @@ TaskQueueItemComponent::TaskQueueItemComponent(const ValueTree& t, TaskQueueItem
     label.setJustificationType(Justification::centred);
     label.setColour(Label::ColourIds::textColourId, sand);
     label.setInterceptsMouseClicks(false, false);
+
+    addAndMakeVisible(completedButton);
+    completedButton.getToggleStateValue().referTo(tree.getPropertyAsValue("completed", &owner.getUndoManager()));
+    completedButton.setColour(ToggleButton::ColourIds::tickColourId, sand);
+    completedButton.setColour(ToggleButton::ColourIds::tickDisabledColourId, sand);
+
 }
 
 void TaskQueueItemComponent::paint(Graphics& g)
@@ -42,6 +48,8 @@ void TaskQueueItemComponent::paint(Graphics& g)
 void TaskQueueItemComponent::resized()
 {
     auto bounds = getLocalBounds().reduced(2);
+    
+    completedButton.setBounds(bounds.getX(), bounds.getY(), bounds.getWidth(), bounds.getHeight());
     label.setBounds(bounds);
 }
 

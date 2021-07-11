@@ -32,6 +32,7 @@ private:
     ValueTree tree;
     TaskQueueItem& owner;
     Label label;
+    ToggleButton completedButton;
 
     juce::Colour olive{ 84u, 94u, 80u };
     juce::Colour olive2{ 62u, 71u, 61u };

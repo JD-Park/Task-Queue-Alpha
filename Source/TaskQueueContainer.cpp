@@ -96,6 +96,7 @@ juce::ValueTree TaskQueueContainer::createTree(const juce::String& desc)
 {
     juce::ValueTree t("Item");
     t.setProperty("name", desc, nullptr);
+    t.setProperty("completed", false, nullptr);
     return t;
 }
 
