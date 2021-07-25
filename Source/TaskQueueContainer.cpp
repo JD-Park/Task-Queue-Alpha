@@ -96,14 +96,21 @@ void TaskQueueContainer::resized()
     fB.flexDirection = FlexBox::Direction::column;
     fB.alignItems = FlexBox::AlignItems::stretch;
 
+    auto getWidthGap = []() { return FlexItem().withWidth(2.0f);};
+    auto getHeightGap = []() { return FlexItem().withHeight(2.0f);};
+
     FlexBox topRow;
     {
         topRow.flexDirection = FlexBox::Direction::row;
         topRow.alignItems = FlexBox::AlignItems::stretch;
 
+        topRow.items.add(getWidthGap());
         topRow.items.add(FlexItem(redoButton).withFlex(1.0f));
+        topRow.items.add(getWidthGap());
         topRow.items.add(FlexItem(undoButton).withFlex(1.0f));
+        topRow.items.add(FlexItem().withFlex(2.0f));
         topRow.items.add(FlexItem(loadButton).withFlex(1.0f));
+        topRow.items.add(getWidthGap());
         topRow.items.add(FlexItem(newButton).withFlex(1.0f));
     }
     FlexBox treeRow;
@@ -118,13 +125,19 @@ void TaskQueueContainer::resized()
         bottomRow.flexDirection = FlexBox::Direction::row;
         bottomRow.alignItems = FlexBox::AlignItems::stretch;
 
+        bottomRow.items.add(getWidthGap());
         bottomRow.items.add(FlexItem(addTaskButton).withFlex(1.0f));
+        bottomRow.items.add(getWidthGap());
         bottomRow.items.add(FlexItem(addSubTaskButton).withFlex(1.0f));
+        bottomRow.items.add(FlexItem().withFlex(2.0f));
         bottomRow.items.add(FlexItem(showHideCompletedButton).withFlex(1.0f));
     }
 
+    fB.items.add(getHeightGap());
     fB.items.add(FlexItem(topRow).withFlex(0.1f).withMinHeight(20.0f).withMaxHeight(30.0f));
+    fB.items.add(getHeightGap());
     fB.items.add(FlexItem(treeRow).withFlex(1.0f));
+    fB.items.add(getHeightGap());
     fB.items.add(FlexItem(bottomRow).withFlex(0.1f).withMinHeight(20.0f).withMaxHeight(30.0f));
     fB.performLayout(bounds);
 }
