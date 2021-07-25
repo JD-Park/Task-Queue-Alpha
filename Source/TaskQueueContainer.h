@@ -76,8 +76,14 @@ private:
 
     void timerCallback() override;
 
-    TextButton addTaskButton{ "Add Task" };
-    TextButton addSubTaskButton{ "Add Sub-Task" };
+    TextButton addTaskButton{ "Add Task" },
+        addSubTaskButton{ "Add Sub-Task" },
+        showHideCompletedButton{ "Hide Completed" },
+        undoButton{ "Undo" },
+        redoButton{ "Redo" },
+        loadButton{ "Load..." },
+        saveButton{ "Save" },
+        newButton{ "New..." };
 
     std::unique_ptr<SelectionMonitor> selectionMonitor;
 

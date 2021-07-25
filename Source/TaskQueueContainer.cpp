@@ -10,12 +10,27 @@
 
 #include "TaskQueueContainer.h"
 #include "TaskQueueItem.h"
+using namespace juce;
 
 TaskQueueContainer::TaskQueueContainer()
 {
-    addAndMakeVisible(tree);
-    addAndMakeVisible(addTaskButton);
-    addAndMakeVisible(addSubTaskButton);
+    //addAndMakeVisible(tree);
+    //addAndMakeVisible(addTaskButton);
+    //addAndMakeVisible(addSubTaskButton);
+
+    for (auto* c : Array<Component*>{ 
+        &tree, 
+        &addTaskButton,
+        &addSubTaskButton,
+        &showHideCompletedButton,
+        &undoButton,
+        &redoButton,
+        &loadButton,
+        &saveButton,
+        &newButton })
+    {
+        addAndMakeVisible(c);
+    }
 
     tree.setDefaultOpenness(true);
     tree.setMultiSelectEnabled(false);
@@ -75,15 +90,42 @@ void TaskQueueContainer::resized()
 
     //tree.setBounds(r);
     auto bounds = getLocalBounds();
-    tree.setBounds(bounds.removeFromTop(getHeight() * 0.9));
+    //tree.setBounds(bounds.removeFromTop(getHeight() * 0.9));
 
     FlexBox fB;
-    fB.flexDirection = FlexBox::Direction::row;
+    fB.flexDirection = FlexBox::Direction::column;
     fB.alignItems = FlexBox::AlignItems::stretch;
 
-    fB.items.add(FlexItem(addTaskButton).withFlex(1));
-    fB.items.add(FlexItem(addSubTaskButton).withFlex(1));
+    FlexBox topRow;
+    {
+        topRow.flexDirection = FlexBox::Direction::row;
+        topRow.alignItems = FlexBox::AlignItems::stretch;
 
+        topRow.items.add(FlexItem(redoButton).withFlex(1.0f));
+        topRow.items.add(FlexItem(undoButton).withFlex(1.0f));
+        topRow.items.add(FlexItem(loadButton).withFlex(1.0f));
+        topRow.items.add(FlexItem(newButton).withFlex(1.0f));
+    }
+    FlexBox treeRow;
+    {
+        treeRow.flexDirection = FlexBox::Direction::row;
+        treeRow.alignItems = FlexBox::AlignItems::stretch;
+
+        treeRow.items.add(FlexItem(tree).withFlex(1.0f));
+    }
+    FlexBox bottomRow;
+    {
+        bottomRow.flexDirection = FlexBox::Direction::row;
+        bottomRow.alignItems = FlexBox::AlignItems::stretch;
+
+        bottomRow.items.add(FlexItem(addTaskButton).withFlex(1.0f));
+        bottomRow.items.add(FlexItem(addSubTaskButton).withFlex(1.0f));
+        bottomRow.items.add(FlexItem(showHideCompletedButton).withFlex(1.0f));
+    }
+
+    fB.items.add(FlexItem(topRow).withFlex(0.1f).withMinHeight(20.0f).withMaxHeight(30.0f));
+    fB.items.add(FlexItem(treeRow).withFlex(1.0f));
+    fB.items.add(FlexItem(bottomRow).withFlex(0.1f).withMinHeight(20.0f).withMaxHeight(30.0f));
     fB.performLayout(bounds);
 }
 
