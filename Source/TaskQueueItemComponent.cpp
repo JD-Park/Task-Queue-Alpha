@@ -10,6 +10,7 @@
 
 #include "TaskQueueItemComponent.h"
 #include "TaskQueueItem.h"
+#include "Utilities.h"
 
 using namespace juce;
 
@@ -68,19 +69,51 @@ void TaskQueueItemComponent::resized()
 
 void TaskQueueItemComponent::valueTreePropertyChanged(ValueTree& treeThatChanged, const Identifier& identifier)
 {
-    /*if (treeThatChanged == tree)
-    {*/
-        //repaint();
-        /*if (identifier == Identifier("name"))
+    if (ignoreCallbacks)
+    {
+        return;
+    }
+
+    ScopedValueSetter<bool> guard(ignoreCallbacks, true);
+
+    //if (identifier == Identifier("completed"))
+    //{
+    //    if (tree["completed"].equals(true))
+    //    {
+    //        for (auto child : tree)
+    //        {
+    //            child.setProperty("completed", true, &owner.getUndoManager());
+    //        }
+    //    }
+    //}
+
+    //updateLabelText();
+
+    if (identifier == Identifier("completed"))
+    {
+        if (treeThatChanged.isAChildOf(tree))
         {
-            if (tree.getNumChildren() > 0)
-            {
-                updateLabelText();
+            int numChildren = 0, numCompleted = 0;
+            tree.setProperty("completed", completedCalculator(tree, numChildren, numCompleted), &owner.getUndoManager());
+            updateLabelText();
+        }
+        else if (tree.isAChildOf(treeThatChanged))
+        {
+
+        }
+        else if (treeThatChanged == tree)
+        {
+            for (auto child : tree)
+            {   
+                child.setProperty("completed", (bool)tree["completed"], &owner.getUndoManager());
             }
-        }*/
-        //}
-    repaint();
-    updateLabelText();
+            updateLabelText();
+        }
+    }
+    else if (identifier == Identifier("name"))
+    {
+        updateLabelText();
+    }
 }
 
 void TaskQueueItemComponent::valueTreeChildAdded(juce::ValueTree& parentTree, juce::ValueTree&)
@@ -123,24 +156,24 @@ void TaskQueueItemComponent::mouseDoubleClick(const MouseEvent& e)
     label.showEditor();
 }
 
-void completedCalculator(ValueTree tree, int& numChildren, int& numCompleted)
-{
-    numChildren += tree.getNumChildren();
-
-    for (int i = 0; i < tree.getNumChildren(); ++i)
-    {
-        auto child = tree.getChild(i);
-        if (child["completed"].equals(true))
-        {
-            ++numCompleted;
-        }
-
-        if (child.getNumChildren() > 0)
-        {
-            completedCalculator(child, numChildren, numCompleted);
-        }
-    }
-}
+//void completedCalculator(ValueTree tree, int& numChildren, int& numCompleted)
+//{
+//    numChildren += tree.getNumChildren();
+//
+//    for (int i = 0; i < tree.getNumChildren(); ++i)
+//    {
+//        auto child = tree.getChild(i);
+//        if (child["completed"].equals(true))
+//        {
+//            ++numCompleted;
+//        }
+//
+//        if (child.getNumChildren() > 0)
+//        {
+//            completedCalculator(child, numChildren, numCompleted);
+//        }
+//    }
+//}
 
 String TaskQueueItemComponent::getNumCompleted()
 {

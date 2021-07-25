@@ -11,3 +11,6 @@
 #pragma once
 
 #include "JuceHeader.h"
+using namespace juce;
+
+bool completedCalculator(ValueTree tree, int& numChildren, int& numCompleted);

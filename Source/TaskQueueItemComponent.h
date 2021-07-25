@@ -39,6 +39,7 @@ private:
     ToggleButton completedButton;
     void updateLabelText();
     void updateLabelBehav();
+    bool ignoreCallbacks{ false };
     //String getNumCompleted;
 
     juce::Colour olive{ 84u, 94u, 80u };
